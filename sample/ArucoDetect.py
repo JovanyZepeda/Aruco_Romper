@@ -67,7 +67,7 @@ arucoDict = cv2.aruco.Dictionary_get(ARUCO_DICT[aruco_type])
 
 arucoParams = cv2.aruco.DetectorParameters_create()
 
-
+# Create a video capture object and  setup the height and width
 cap = cv2.VideoCapture(0)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
@@ -77,8 +77,13 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 while cap.isOpened():
     
 	ret, img = cap.read()
-
+	
+	# .shape is a numpy function that return array dimension
+	# for a colored image -> (height, width, color_channels)
+	# RGB image -> color_channels = 3
 	h, w, _ = img.shape
+
+	print(str(_))
 
 	width = 1000
 	height = int(width*(h/w))
