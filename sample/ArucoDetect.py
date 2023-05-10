@@ -33,9 +33,12 @@ def aruco_display(corners, ids, rejected, image):
 		
 		ids = ids.flatten()
 		
+		# Go through all found markers and ids in frame
 		for (markerCorner, markerID) in zip(corners, ids):
 			
+			# using NUMPY attributes and turn the vector into a matrix
 			corners = markerCorner.reshape((4, 2))
+			# extract the cornes pixel locations
 			(topLeft, topRight, bottomRight, bottomLeft) = corners
 			
 			topRight = (int(topRight[0]), int(topRight[1]))
@@ -43,25 +46,35 @@ def aruco_display(corners, ids, rejected, image):
 			bottomLeft = (int(bottomLeft[0]), int(bottomLeft[1]))
 			topLeft = (int(topLeft[0]), int(topLeft[1]))
 
+			# Draw a square around the arucos with RED lines and border thinkness of 2
 			cv2.line(image, topLeft, topRight, (0, 255, 0), 2)
 			cv2.line(image, topRight, bottomRight, (0, 255, 0), 2)
 			cv2.line(image, bottomRight, bottomLeft, (0, 255, 0), 2)
 			cv2.line(image, bottomLeft, topLeft, (0, 255, 0), 2)
 			
+			# Calculate the Center X and center Y position
 			cX = int((topLeft[0] + bottomRight[0]) / 2.0)
 			cY = int((topLeft[1] + bottomRight[1]) / 2.0)
+
+			# Draw a circle to indicate the center of the aruco
 			cv2.circle(image, (cX, cY), 4, (0, 0, 255), -1)
+			
 			
 			cv2.putText(image, str(markerID),(topLeft[0], topLeft[1] - 10), cv2.FONT_HERSHEY_SIMPLEX,
 				0.5, (0, 255, 0), 2)
 			print("[Inference] ArUco marker ID: {}".format(markerID))
+
+
+
+			# overlay all minecraft blocks over corresponding markers
+
 			
 	return image
 
 
 
 
-aruco_type = "DICT_4X4_100"
+aruco_type = "DICT_4X4_50"
 
 arucoDict = cv2.aruco.Dictionary_get(ARUCO_DICT[aruco_type])
 
@@ -73,6 +86,15 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
+# Create img objects of each minecraft block
+# img_ID where ID is the corresponding marker ID
+img_0_path = "\images\mc_grass_block.jpg"
+img_1_path = "\images\mc_diamond_ore.png"
+
+img_0 = cv2.imread(img_0_path)
+img_1 = cv2.imread(img_1_path)
+
+
 
 while cap.isOpened():
     
@@ -83,7 +105,6 @@ while cap.isOpened():
 	# RGB image -> color_channels = 3
 	h, w, _ = img.shape
 
-	print(str(_))
 
 	width = 1000
 	height = int(width*(h/w))
