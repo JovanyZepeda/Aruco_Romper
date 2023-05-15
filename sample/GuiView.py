@@ -1,9 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import *
 from PIL import ImageTk, Image
 import ArucoModel as am
-
 from multiprocessing import Process, Queue
 
 
@@ -41,7 +39,7 @@ class View(tk.Frame):
             row=0,
             column=1,
             rowspan=3,
-            sticky=NSEW,
+            sticky=tk.NSEW,
         )
 
 
@@ -53,7 +51,7 @@ class View(tk.Frame):
         ).grid(
             row=0,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
         
 
@@ -61,21 +59,21 @@ class View(tk.Frame):
         self.MenuTop.grid(
             row=0,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.MenuMiddle = ttk.Frame(master=self.TopLevelMenuFrame, padding=self.frame_padding, relief="raised")
         self.MenuMiddle.grid(
             row=1,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.MenuBottom  = ttk.Frame(master=self.TopLevelMenuFrame, padding=self.frame_padding, relief="raised")
         self.MenuBottom.grid(
             row=2,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         #============ Widget Definitions =========#
@@ -87,7 +85,7 @@ class View(tk.Frame):
         self.MenuTopText.grid(
             row=0,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
         
         # Middle Menu Widgets
@@ -99,7 +97,7 @@ class View(tk.Frame):
         self.DataBlock0.grid(
             row=0,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
 
@@ -111,7 +109,7 @@ class View(tk.Frame):
         self.DataBlock1.grid(
             row=0,
             column=1,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.DataBlock2 = ttk.Button(
@@ -122,7 +120,7 @@ class View(tk.Frame):
         self.DataBlock2.grid(
             row=1,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.DataBlock3 = ttk.Button(
@@ -133,7 +131,7 @@ class View(tk.Frame):
         self.DataBlock3.grid(
             row=1,
             column=1,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
         
         self.DataBlock4 = ttk.Button(
@@ -144,7 +142,7 @@ class View(tk.Frame):
         self.DataBlock4.grid(
             row=2,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.DataBlock5 = ttk.Button(
@@ -155,7 +153,7 @@ class View(tk.Frame):
         self.DataBlock5.grid(
             row=2,
             column=1,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.DataBlock6 = ttk.Button(
@@ -166,7 +164,7 @@ class View(tk.Frame):
         self.DataBlock6.grid(
             row=3,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.DataBlock7 = ttk.Button(
@@ -177,7 +175,7 @@ class View(tk.Frame):
         self.DataBlock7.grid(
             row=3,
             column=1,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.DataBlock8 = ttk.Button(
@@ -188,7 +186,7 @@ class View(tk.Frame):
         self.DataBlock8.grid(
             row=4,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         # Bottom Menu Widgets
@@ -200,7 +198,7 @@ class View(tk.Frame):
         self.MenuResetbtn.grid(
             row=0,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         self.MenuBar = ttk.Progressbar(
@@ -209,7 +207,7 @@ class View(tk.Frame):
         self.MenuBar.grid(
             row=0,
             column=1,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
 
         # Open CV Image Viewer
@@ -220,7 +218,7 @@ class View(tk.Frame):
         self.OpenCvImage.grid(
             row=0,
             column=0,
-            sticky=NSEW
+            sticky=tk.NSEW
         )
         
     def ButtonPress0(self):
@@ -427,28 +425,65 @@ class View(tk.Frame):
 
         pass
 
-    def UpdateImageView(self, OpenCVImage):
+    def UpdateImageView(self):
         
-        #update the image widger
-        self.OpenCvImage.configure(
-            image=ImageTk.PhotoImage(image=OpenCVImage)
-        )
+        try:
+            
+            # # get image frame from openCV
+            # image_frame = q.get()
 
-        pass
+            # # convert into image from array
+            # OpenCVImageFrame = Image.fromarray(am.video_loop())
+            self.OpenCVImageFrame = am.video_loop()
+            self.OpenCVImageFrame = Image.fromarray(self.OpenCVImageFrame)
+            self.OpenCVImageFrame = ImageTk.PhotoImage(image=self.OpenCVImageFrame)
+
+            if self.OpenCVImageFrame is None:
+                # print("Image not showon")
+                #update the image widger
+                self.OpenCvImage.configure(
+                    image=self.img9
+                )
+            else:
+                # print("Show Image")
+                #update the image widget
+                self.OpenCvImage.configure(
+                    image=self.OpenCVImageFrame
+                )
+
+            # Start Recursive Call
+            self.after(
+                ms=10,
+                func=self.UpdateImageView
+            )
+
+        except:
+            pass
 
 
-if __name__ == "__main__":
-    root = tk.Tk() # Create the toplevel parent window
-    root.title('GUI Test')
-    
-    am.startCV2()
+# if __name__ == "__main__":
 
-    myapp = View(root)
+#     # root = tk.Tk() # Create the toplevel parent window
+#     # root.title('GUI Test')
 
-    # update image viewer at 30Hz
-    myapp.after(
-        ms=30,
-        func=myapp.UpdateImageView
-    )
+#     # myapp = View(root)
 
-    myapp.mainloop() 
+#     # # create queue
+#     # q = Queue()
+
+#     # # create a proccess that calls the function to update image 
+#     # p2 = Process(
+#     #     target=myapp.UpdateImageView,
+#     #     args=(q,)
+#     # )
+#     # p2.start()
+
+
+#     # # update image viewer at 30Hz
+#     # myapp.after(
+#     #     ms=30,
+#     #     func=myapp.UpdateImageView
+#     # )
+
+#     # myapp.mainloop() 
+#     pass

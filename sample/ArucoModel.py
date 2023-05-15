@@ -1,6 +1,8 @@
 import numpy as np
 import time
 import cv2
+from multiprocessing import Process, Queue
+
 
 # Store all possible Aruco Dicts
 ARUCO_DICT = {
@@ -144,21 +146,21 @@ def aruco_display(corners, ids, rejected, image):
 			topLeft = (int(topLeft[0]), int(topLeft[1]))
 
 			# Draw a square around the arucos with RED lines and border thinkness of 2
-			cv2.line(image, topLeft, topRight, (0, 255, 0), 2)
-			cv2.line(image, topRight, bottomRight, (0, 255, 0), 2)
-			cv2.line(image, bottomRight, bottomLeft, (0, 255, 0), 2)
-			cv2.line(image, bottomLeft, topLeft, (0, 255, 0), 2)
+			# cv2.line(image, topLeft, topRight, (0, 255, 0), 2)
+			# cv2.line(image, topRight, bottomRight, (0, 255, 0), 2)
+			# cv2.line(image, bottomRight, bottomLeft, (0, 255, 0), 2)
+			# cv2.line(image, bottomLeft, topLeft, (0, 255, 0), 2)
 			
 			# Calculate the Center X and center Y position
 			cX = int((topLeft[0] + bottomRight[0]) / 2.0)
 			cY = int((topLeft[1] + bottomRight[1]) / 2.0)
 
 			# Draw a circle to indicate the center of the aruco
-			cv2.circle(image, (cX, cY), 4, (0, 0, 255), -1)
+			# cv2.circle(image, (cX, cY), 4, (0, 0, 255), -1)
 			
 			
 			cv2.putText(image, str(markerID),(topLeft[0], topLeft[1] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-				0.5, (0, 255, 0), 2)
+				0.5, (255, 0, 0), 2)
 			# print("[Inference] ArUco marker ID: {}".format(markerID))
 
 			image = ArucoToImg(markerID=markerID, 
@@ -359,16 +361,15 @@ def ArucoToImg(markerID,topLeft, topRight, bottomRight, image, all_warped_mc_img
 			markerID=markerID,
 			image_center_y=image_center_y,
 			topLeft=topLeft,
-			y_spacing=50
+			y_spacing=15
 		)
 
 
 	return image
 
-def startCV2():
-
-	while cap.isOpened():
-		
+def video_loop():
+	try: 
+		# print("Take IMAGE")
 		ret, img = cap.read()
 		
 		# .shape is a numpy function that return array dimension
@@ -386,14 +387,43 @@ def startCV2():
 
 		detected_markers = aruco_display(corners, ids, rejected, img)
 
-		cv2.imshow("Image", detected_markers)
-
+		detected_markers = cv2.cvtColor(
+			code=cv2.COLOR_BGR2RGB,
+			src=detected_markers
+		)
+		
+		# exit openCV via lowercase "q"
 		key = cv2.waitKey(1) & 0xFF
 		if key == ord("q"):
-			break
+			cv2.destroyAllWindows()
+			cap.release()
 
-	cv2.destroyAllWindows()
-	cap.release()
+		# cv2.imshow("Image", detected_markers)
+		return detected_markers
+		# put proccessed image in queue
+		# q.put(detected_markers)
+
+		# exit openCV via lowercase "q"
+		key = cv2.waitKey(1) & 0xFF
+		if key == ord("q"):
+			cv2.destroyAllWindows()
+			cap.release()
+
+		
+	except:
+		cv2.destroyAllWindows()
+		cap.release()
+		print("VideoCamera Released")
+		pass
 
 if(__name__ == "__main__" ):
-	startCV2()
+	# Create a queue to hold frames from the video capture
+    # q = Queue()
+
+    # # Create a process to capture video frames and put them in the queue
+    # p = Process(target=video_loop, args=(q,))
+    # p.start()
+
+    # # Wait for the process to finish
+    # p.join()
+	pass
