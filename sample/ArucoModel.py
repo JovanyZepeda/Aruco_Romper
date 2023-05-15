@@ -88,7 +88,7 @@ img_4_alt_text = r"I am studying electrical engineering"
 img_5_alt_text = r"I have a cat named Hope"
 img_6_alt_text = r"My favorite PC game is Elden Ring"
 img_7_alt_text = r"I am 5 foot and 4 inches tall"
-img_8_alt_text = r"My hobbies include robotics, gaming, engineering, and audible"
+img_8_alt_text = "My hobbies include robotics,\n gaming, engineering, and audible"
 img_9_alt_text = "TEST-TEST-TEST-TEST-TEST-\n TEST-TEST-TEST-TEST-TEST-TEST-TEST-TEST"
 
 # Create a connection between IDs and Text data
